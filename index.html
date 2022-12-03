@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple ServiceWorker Check</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <div id="head" class="text-center mt-4">
+        <h1>Simple Service Workers Fingerprinting Leaks Test</h1>
+    </div>
+    <p class="m-4">ServiceWorker Status: <strong id="sw"></strong></p>
+    <p class="m-4">Consistent: <strong id="consisency"></strong></p>
+    <div class="m-4">
+        <h3>Results:</h3>
+        <table id="results-table" class="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Test</th>
+                <th scope="col">Browser</th>
+                <th scope="col">Service Worker</th>
+              </tr>
+            </thead>
+          </table>
+          <h3>Extended Results:</h3>
+          <ul id="extended-results" class="list-group"></ul>
+    </div>
+</body>
+<script src="./scripts/sw-registration.js"></script>
+<script src="./scripts/window.fp.js"></script>
+<script src="./scripts/extended.fp.js"></script>
+</html>

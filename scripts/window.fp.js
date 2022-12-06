@@ -65,11 +65,11 @@ broadcast.onmessage = (event) => {
         document.getElementById(`sw-${key}`).innerHTML = value
     }
     check_res(Object.keys(event.data))
-    // navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    //     for(let registration of registrations) {
-    //         registration.unregister()
-    //     } 
-    // })
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister()
+        } 
+    })
 };
 
 const tbody = document.createElement('tbody')

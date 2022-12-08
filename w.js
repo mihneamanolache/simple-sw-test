@@ -45,4 +45,8 @@ const props = {
     'fake.navigator.platfrom': res["fake.navigator.platfrom"],
 }
 
-self.postMessage(props)
+const w_path = new URL(location).toString()
+self.postMessage({
+    props:props,
+    url: w_path
+})

@@ -128,10 +128,15 @@ broadcastPath.onmessage = (event) => {
 if (window.Worker) {
     const webWorker = new Worker('w.js');
     webWorker.onmessage = (event) => {
-        for (const [key, value] of Object.entries(event.data)) {
+        for (const [key, value] of Object.entries(event.data.props)) {
             document.getElementById(`w-${key}`).innerHTML = value
         }
-        check_res(Object.keys(event.data))
+        fetch(event.data.url).then((res) => {
+            return res.text()
+        }).then((data)=>{
+            document.getElementById('w-body').innerHTML = data
+        })
+        check_res(Object.keys(event.data.props))
     }
 }
   

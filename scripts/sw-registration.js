@@ -3,6 +3,7 @@ if ('serviceWorker' in navigator) {
     .then((registration) => {
         document.getElementById('sw').innerHTML = 'registered'  
     }, (error) => {
+        document.getElementById('sw').innerHTML = 'failed'  
         console.error(`Service worker registration failed: ${error}`);
     });
 } else {

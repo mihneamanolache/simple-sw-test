@@ -1,3 +1,7 @@
+const path = new URL(location)
+const broadcastPath = new BroadcastChannel('sw-path')
+broadcastPath.postMessage(path.href)
+
 let res = {}
 
 try { res["navigator.userAgent"] = navigator.userAgent } 
@@ -21,6 +25,13 @@ catch (e) { res["navigator.hardwareConcurrency"] = e.toString() }
 try { const date = new Date(); res["date.getTimezoneOffset"] = date.getTimezoneOffset() } 
 catch (e) { res["date.getTimezoneOffset"] = e.toString() } 
 
+Object.defineProperty(navigator, "platform", {
+    get: () => {return 'FakeBorwser'}
+});
+
+try { res["fake.navigator.platfrom"] = navigator.platform } 
+catch (e) { res["fake.navigator.platfrom"] = e.toString() } 
+
 const props = {
     'navigator.userAgent':res['navigator.userAgent'],
     'navigator.language':res['navigator.language'],
@@ -31,6 +42,7 @@ const props = {
     'navigator.deviceMemory':res['navigator.deviceMemory'],
     'navigator.hardwareConcurrency': res['navigator.hardwareConcurrency'],
     'date.getTimezoneOffset': res["date.getTimezoneOffset"],
+    'fake.navigator.platfrom': res["fake.navigator.platfrom"],
 }
 
 const broadcast = new BroadcastChannel('sw-channel')

@@ -1,7 +1,8 @@
 const check_res = (props) => {
     let inconsistencies = 0
     props.forEach(prop => {
-        if (document.getElementById(`sw-${prop}`).innerHTML === document.getElementById(`br-${prop}`).innerHTML) {
+        if (!document.getElementById(`w-${prop}`).innerHTML || !document.getElementById(`sw-${prop}`).innerHTML) return
+        if (document.getElementById(`sw-${prop}`).innerHTML === document.getElementById(`br-${prop}`).innerHTML && document.getElementById(`br-${prop}`).innerHTML === document.getElementById(`w-${prop}`).innerHTML) {
             document.getElementById(`sw-${prop}`).parentElement.classList.add('table-success')
         } else {
             inconsistencies += 1
@@ -101,6 +102,11 @@ for (const [key, value] of Object.entries(props)) {
     td_sw.setAttribute('style', "word-break:break-all;" )
     tr.appendChild(td_sw)
 
+    let td_w = document.createElement('th')
+    td_w.setAttribute('id', `w-${key}`)
+    td_w.setAttribute('style', "word-break:break-all;" )
+    tr.appendChild(td_w)
+
     tbody.appendChild(tr)
 }
 
@@ -118,3 +124,14 @@ broadcastPath.onmessage = (event) => {
         document.getElementById('sw-body').innerHTML = data
     })
 }
+
+if (window.Worker) {
+    const webWorker = new Worker('w.js');
+    webWorker.onmessage = (event) => {
+        for (const [key, value] of Object.entries(event.data)) {
+            document.getElementById(`w-${key}`).innerHTML = value
+        }
+        check_res(Object.keys(event.data))
+    }
+}
+  

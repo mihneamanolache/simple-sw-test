@@ -1,6 +1,4 @@
 const path = new URL(location)
-const broadcastPath = new BroadcastChannel('sw-path')
-broadcastPath.postMessage(path.href)
 
 let res = {}
 
@@ -45,5 +43,10 @@ const props = {
     'fake.navigator.platfrom': res["fake.navigator.platfrom"],
 }
 
+const data = {
+    props: props,
+    url: path.href,
+}
+
 const broadcast = new BroadcastChannel('sw-channel')
-broadcast.postMessage(props)
+broadcast.postMessage(data)

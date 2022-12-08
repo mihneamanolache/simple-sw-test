@@ -70,10 +70,15 @@ const props = {
 
 const broadcast = new BroadcastChannel('sw-channel');
 broadcast.onmessage = (event) => {
-    for (const [key, value] of Object.entries(event.data)) {
+    fetch(event.data.url).then((res) => {
+        return res.text()
+    }).then((data)=>{
+        document.getElementById('sw-body').innerHTML = data
+    })
+    for (const [key, value] of Object.entries(event.data.props)) {
         document.getElementById(`sw-${key}`).innerHTML = value
     }
-    check_res(Object.keys(event.data))
+    check_res(Object.keys(event.data.props))
     navigator.serviceWorker.getRegistrations().then(function(registrations) {
         for(let registration of registrations) {
             registration.unregister()
@@ -114,15 +119,6 @@ document.getElementById('results-table').appendChild(tbody)
 
 for (const [key, value] of Object.entries(props)) {
     document.getElementById(`br-${key}`).innerHTML = value
-}
-
-const broadcastPath = new BroadcastChannel('sw-path');
-broadcastPath.onmessage = (event) => {
-    fetch(event.data).then((res) => {
-        return res.text()
-    }).then((data)=>{
-        document.getElementById('sw-body').innerHTML = data
-    })
 }
 
 if (window.Worker) {

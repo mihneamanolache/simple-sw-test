@@ -124,6 +124,7 @@ for (const [key, value] of Object.entries(props)) {
 if (window.Worker) {
     const webWorker = new Worker('w.js');
     webWorker.onmessage = (event) => {
+        console.log(event.data.url)
         for (const [key, value] of Object.entries(event.data.props)) {
             document.getElementById(`w-${key}`).innerHTML = value
         }

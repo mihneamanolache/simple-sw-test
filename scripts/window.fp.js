@@ -1,3 +1,17 @@
+const w_body_hash = 'acca31f4'
+const sw_body_hash = '0d74bd9e'
+
+/** Thank you https://github.com/abrahamjuliot/creepjs/ */
+const hashMini =  x => {
+    if (!x) return x
+    const json = `${JSON.stringify(x)}`
+    const hash = json.split('').reduce((hash, char, i) => {
+        return Math.imul(31, hash) + json.charCodeAt(i) | 0
+    }, 0x811c9dc5)
+    return ('0000000' + (hash >>> 0).toString(16)).substr(-8)
+}
+/** Give abrahamjuliot's project a star! */
+
 const check_res = (props) => {
     let inconsistencies = 0
     props.forEach(prop => {
@@ -74,6 +88,12 @@ broadcast.onmessage = (event) => {
         return res.text()
     }).then((data)=>{
         document.getElementById('sw-body').innerHTML = data
+        if ( hashMini(data) !== sw_body_hash ) {
+            document.getElementById('sw-body-title').innerHTML = 'Altered Service Worker Body:'
+            document.getElementById('consisency').innerHTML = 'False'
+            document.getElementById('sw-body').classList.add('bg-danger')
+            document.getElementById('sw-body').classList.add('text-white')
+        }
     })
     for (const [key, value] of Object.entries(event.data.props)) {
         document.getElementById(`sw-${key}`).innerHTML = value
@@ -132,8 +152,13 @@ if (window.Worker) {
             return res.text()
         }).then((data)=>{
             document.getElementById('w-body').innerHTML = data
+            if ( hashMini(data) !== w_body_hash ) {
+                document.getElementById('w-body-title').innerHTML = 'Altered Web Worker Body:'
+                document.getElementById('consisency').innerHTML = 'False'
+                document.getElementById('w-body').classList.add('bg-danger')
+                document.getElementById('w-body').classList.add('text-white')
+            }
         })
         check_res(Object.keys(event.data.props))
     }
 }
-  

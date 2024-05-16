@@ -1,3 +1,5 @@
+[![ProxyShare.io - 4G Mobile Proxies](https://github.com/mihneamanolache/puppeteer-extra-amazon-captcha/assets/43548656/c3efa5c2-848c-4c21-a184-c0190e6d6f35)](https://www.proxyshare.io/)
+
 # Browserless ServiceWorkers Leak Test
 
 [`puppeteer-extra-plugin-stealth`](https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth) is definitely the leading project when it comes to headless browser evasion techniques. However, browser fingerprinting is not limited to window scoped techniques. `simple-sw-test` is designed to highlight the differences found in window scoped vs. [Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) detection methods.

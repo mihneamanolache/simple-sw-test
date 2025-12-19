@@ -162,3 +162,34 @@ if (window.Worker) {
         check_res(Object.keys(event.data.props))
     }
 }
+
+const rfc1918Targets = [
+    { label: '10.0.0.1', url: 'http://10.0.0.1/' },
+    { label: '172.16.0.1', url: 'http://172.16.0.1/' },
+    { label: '192.168.0.1', url: 'http://192.168.0.1/' }
+]
+
+const addRfc1918Result = (label, status, detail) => {
+    const li = document.createElement('li')
+    li.className = 'list-group-item'
+    li.textContent = `${label}: ${status}${detail ? ` (${detail})` : ''}`
+    document.getElementById('rfc1918-results').appendChild(li)
+}
+
+const runRfc1918FetchTests = async () => {
+    for (const target of rfc1918Targets) {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 3000)
+        try {
+            await fetch(target.url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal })
+            addRfc1918Result(target.label, 'reachable')
+        } catch (e) {
+            const isTimeout = e && e.name === 'AbortError'
+            addRfc1918Result(target.label, isTimeout ? 'timeout' : 'blocked/failed', e && e.name ? e.name : '')
+        } finally {
+            clearTimeout(timeoutId)
+        }
+    }
+}
+
+runRfc1918FetchTests()

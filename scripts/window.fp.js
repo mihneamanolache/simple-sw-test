@@ -178,6 +178,12 @@ const addRfc1918Result = (label, status, detail) => {
 
 const runRfc1918FetchTests = async () => {
     for (const target of rfc1918Targets) {
+        const pageIsHttps = window.location.protocol === 'https:'
+        const targetIsHttp = target.url.startsWith('http://')
+        if (pageIsHttps && targetIsHttp) {
+            addRfc1918Result(target.label, 'blocked/mixed content')
+            continue
+        }
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 3000)
         try {

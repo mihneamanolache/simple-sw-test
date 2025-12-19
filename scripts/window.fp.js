@@ -169,33 +169,81 @@ const rfc1918Targets = [
     { label: '192.168.0.1', url: 'http://192.168.0.1/' }
 ]
 
+const rfc1918ImageSweep = {
+    enabled: true,
+    base: '192.168.1',
+    start: 1,
+    end: 254,
+    path: '/ping'
+}
+
 const addRfc1918Result = (label, status, detail) => {
     const li = document.createElement('li')
     li.className = 'list-group-item'
     li.textContent = `${label}: ${status}${detail ? ` (${detail})` : ''}`
-    document.getElementById('rfc1918-results').appendChild(li)
+    document.getElementById('rfc1918-image-results').appendChild(li)
 }
 
-const runRfc1918FetchTests = async () => {
-    for (const target of rfc1918Targets) {
-        const pageIsHttps = window.location.protocol === 'https:'
-        const targetIsHttp = target.url.startsWith('http://')
-        if (pageIsHttps && targetIsHttp) {
-            addRfc1918Result(target.label, 'blocked/mixed content')
-            continue
-        }
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 3000)
-        try {
-            await fetch(target.url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal })
-            addRfc1918Result(target.label, 'reachable')
-        } catch (e) {
-            const isTimeout = e && e.name === 'AbortError'
-            addRfc1918Result(target.label, isTimeout ? 'timeout' : 'blocked/failed', e && e.name ? e.name : '')
-        } finally {
-            clearTimeout(timeoutId)
+const buildRfc1918ImageTargets = () => {
+    const targets = [...rfc1918Targets]
+    if (rfc1918ImageSweep.enabled) {
+        for (let i = rfc1918ImageSweep.start; i <= rfc1918ImageSweep.end; i++) {
+            const host = `${rfc1918ImageSweep.base}.${i}`
+            targets.push({
+                label: `${host}${rfc1918ImageSweep.path}`,
+                url: `http://${host}${rfc1918ImageSweep.path}`
+            })
         }
     }
+    return targets
 }
 
-runRfc1918FetchTests()
+const probeImage = (url, timeoutMs) => new Promise((resolve) => {
+    const img = new Image()
+    let done = false
+    const finalize = (status) => {
+        if (done) return
+        done = true
+        clearTimeout(timerId)
+        img.onload = null
+        img.onerror = null
+        resolve(status)
+    }
+    const timerId = setTimeout(() => finalize('timeout'), timeoutMs)
+    img.onload = () => finalize('loaded')
+    img.onerror = () => finalize('error')
+    img.referrerPolicy = 'no-referrer'
+    img.src = `${url}${url.includes('?') ? '&' : '?'}r=${Date.now()}${Math.random().toString(16).slice(2)}`
+})
+
+const runRfc1918ImageTests = async () => {
+    const targets = buildRfc1918ImageTargets()
+    const concurrency = 20
+    let index = 0
+
+    const runWorker = async () => {
+        while (index < targets.length) {
+            const target = targets[index]
+            index += 1
+            const pageIsHttps = window.location.protocol === 'https:'
+            const targetIsHttp = target.url.startsWith('http://')
+            if (pageIsHttps && targetIsHttp) {
+                addRfc1918Result(target.label, 'blocked/mixed content')
+                continue
+            }
+            const status = await probeImage(target.url, 3000)
+            if (status === 'loaded') {
+                addRfc1918Result(target.label, 'reachable')
+            } else if (status === 'timeout') {
+                addRfc1918Result(target.label, 'timeout')
+            } else {
+                addRfc1918Result(target.label, 'blocked/failed')
+            }
+        }
+    }
+
+    const workers = Array.from({ length: concurrency }, () => runWorker())
+    await Promise.all(workers)
+}
+
+runRfc1918ImageTests()
